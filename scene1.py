@@ -73,7 +73,7 @@ for (iphi0,phi0_deg) in enumerate(PHI0_DEG):
     sources[iphi0] = region
 
 #%%    
-plot_scene(ac6a,sources,min_L=L0-0.5,max_L=L0+0.5)
+plot_scene(ac6a,sources,min_L=L0-0.1,max_L=L0+0.1)
 plt.title('All Source Regions')
 plt.savefig('figures/scene1-scene')
 
@@ -94,7 +94,7 @@ hss[0].set_label('$c_{ss}$') # set label on last one only
 
 plt.xlabel('t, seconds (AC6-B shifted by %g seconds)' % time_shift)
 plt.ylabel('DOS1 rate')
-plt.legend(fontsize='small')
+plt.legend(fontsize='medium')
 plt.savefig('figures/scene1-rates')
 
 # note: s/c transit time across a 75 km source at L=5 is about 1.1 seconds

@@ -110,7 +110,7 @@ for (ac6,it,color) in [(ac6a_real,ita,'b'),(ac6b_real,itb,'r')]:
 ac6a = {}
 ac6b = {}
 for (fast,real,it) in [(ac6a,ac6a_real,ita),(ac6b,ac6b_real,itb)]:
-    fast['t'] = np.linspace(real['t'][0],real['t'][-1],(real['t'][-1]-real['t'][0])*oversample+1)
+    fast['t'] = np.linspace(real['t'][0],real['t'][-1],int((real['t'][-1]-real['t'][0])*oversample+1))
     for key in ['alt','lat','lon']:
         fast[key] = interp1d(real['t'],real[key][it])(fast['t'])
     for key in ['x','y','z','L','theta','phi','Xeq','Yeq']:
@@ -412,10 +412,11 @@ for (low,fake,res) in [(fa10Hz,fac6a,fresulta),(fb10Hz,fac6b,fresultb)]:
     low['raw'] = ConvMean(res['rate'],1-tenHz//2,tenHz//2)[tenHz//2::tenHz]
     low['rate'] = low['raw'] + bg_func(low['L'])   
 
-#%
+#%%
 plt.figure()
 plt.semilogy(fa1sec['t'],fa1sec['rate'],'-',label='Sim AC6-A',color='b')
 plt.semilogy(fb1sec['t']-time_shift,fb1sec['rate'],'--',label='Sim AC6-B',color='r')
+plt.semilogy(fa1sec['t'],bg_func(fa1sec['L']),'k--',label='Background') # evaluate on dipole L, plot on time
 plt.xlabel('t, seconds (AC6-B shifted by %g seconds)' % time_shift)
 plt.ylabel('DOS1 Rate (1 Hz sampling)')
 plt.legend()
@@ -425,6 +426,7 @@ plt.savefig('figures/scene-real-fake-vs-time-%s.png' % source_method)
 plt.figure()
 plt.semilogy(fa10Hz['t'],fa10Hz['rate'],'-',label='Sim AC6-A',color='b')
 plt.semilogy(fb10Hz['t']-time_shift,fb10Hz['rate'],'--',label='Sim AC6-B',color='r')
+plt.semilogy(fa10Hz['t'],bg_func(fa10Hz['L']),'k--',label='Background') # evaluate on dipole L, plot on time
 plt.xlabel('t, seconds (AC6-B shifted by %g seconds)' % time_shift)
 plt.ylabel('DOS1 Rate (10 Hz sampling)')
 plt.legend()
@@ -434,6 +436,8 @@ plt.savefig('figures/scene-real-fake-vs-time-10Hz-%s.png' % source_method)
 plt.figure()
 plt.semilogy(fa10Hz['t'],fa10Hz['rate'],'-',label='Sim AC6-A',color='b')
 plt.semilogy(fb10Hz['t']-time_shift,fb10Hz['rate'],'--',label='Sim AC6-B',color='r')
+plt.semilogy(fa10Hz['t'],bg_func(fa10Hz['L']),'k--',label='Background') # evaluate on dipole L, plot on time
+
 plt.xlabel('t, seconds (AC6-B shifted by %g seconds)' % time_shift)
 plt.ylabel('DOS1 Rate (10 Hz sampling)')
 if source_method == 'RATES':
