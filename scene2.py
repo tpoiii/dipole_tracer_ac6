@@ -71,13 +71,25 @@ for (iphi0,phi0_deg) in enumerate(PHI0_DEG):
 
 allregions = [region for sublist in sources for region in sublist] # flatten list of lists
     
-plot_scene(ac6a,allregions,min_L=L0s[0]-0.5,max_L=L0s[-1]+0.5)
-plt.title('All Source Regions')
+# %% make all-source plots
+fs = 20 # font size
+plot_scene(ac6a,allregions,min_L=L0s[0]-0.05,max_L=L0s[-1]+0.05)
+# No title
+# clear axis labels
+plt.xlabel('')
+plt.ylabel('')
+# enlarge tick marks
+xticks = plt.xticks()[0]
+plt.xticks(xticks[::2],fontsize=fs) # sparsers x ticks
+plt.yticks(fontsize=fs)
 plt.savefig('figures/scene2-scene')
 
-iLa = (ac6a['L']>=L0s[0]-0.025) & (ac6a['L']<=L0s[-1]+0.125)
-iLb = (ac6b['L']>=L0s[0]-0.025) & (ac6b['L']<=L0s[-1]+0.125)
-plt.figure()
+
+iLa = (ac6a['L']>=L0s[0]-0.025) & (ac6a['L']<=L0s[-1]+0.06)
+iLb = (ac6b['L']>=L0s[0]-0.025) & (ac6b['L']<=L0s[-1]+0.06)
+fig = plt.figure()
+wh = fig.get_size_inches()
+fig.set_size_inches([wh[0]*2,wh[1]])
 for (iphi0,phi0_deg) in enumerate(PHI0_DEG):
     plt.plot(ac6a['t'][iLa],doseratea[iphi0][iLa],'-',label='AC6-A,${\phi}_s=%g^o$' % phi0_deg,color=colors[iphi0])
     plt.plot(ac6b['t'][iLb]-time_shift,doserateb[iphi0][iLb],'--',label='AC6-B,${\phi}_s=%g^o$' % phi0_deg,color=colors[iphi0])
@@ -89,5 +101,5 @@ hss[0].set_label('$c_{ss}$') # set label on last one only
 
 plt.xlabel('t, seconds (AC6-B shifted by %g seconds)' % time_shift)
 plt.ylabel('DOS1 rate')
-plt.legend(fontsize='small')
+plt.legend(fontsize='medium')
 plt.savefig('figures/scene2-rates')

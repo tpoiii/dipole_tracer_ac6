@@ -1124,7 +1124,7 @@ def fake_ac6(L1,L2,t0=0.0,dt=0.1,lon=0.0,alt=600):
     lat1 = np.degrees(np.arccos((L1*akm/R)**-0.5))
     lat2 = np.degrees(np.arccos((L2*akm/R)**-0.5))
     ac6 = {}
-    ac6['lat'] = np.linspace(lat1,lat2,np.ceil(np.abs(lat2-lat1)/dlatdt/dt))
+    ac6['lat'] = np.linspace(lat1,lat2,int(np.ceil(np.abs(lat2-lat1)/dlatdt/dt)))
     ac6['t']= t0+(ac6['lat']-lat1)/dlatdt
     ac6['lon'] = np.zeros(ac6['t'].shape)+lon
     ac6['alt'] = np.zeros(ac6['t'].shape)+alt

@@ -5,8 +5,6 @@ source regions at various distances from ac6 and multiple rs
 Different pulse radii at each L
 ac6b ~60 seconds behind ac6b
 
-Contributors: Colby Lemon, Paul O'Brien
-
 """
 
 import json
