@@ -68,15 +68,16 @@ def KL2alpha(K,L,Bunit='nT'):
         table = {}
         dy = 1e-4
         #Start at dy:go in steps of dy: up to 1
-        table['y'] = np.arange(dy,1+dy/2,dy)
-        table['Yy'] = SL_Y(table['y'])/table['y']
+        table['y'] = np.flip(np.concatenate((np.arange(dy,1+dy/2,dy),[1]))) # descending
+        table['Yy'] = SL_Y(table['y'])/table['y'] # ascending
+        _KL2alpha_table = table
     if Bunit=='G':
         K = K*np.sqrt(1e5) # RE*sqrt(G) to RE*sqrt(nT)
     # K*sqrt(L)/sqrt(B0) = Y(y)/y
     KLB = K*np.sqrt(L)/np.sqrt(SL['B0']*1e9)
-    y = np.interp(KLB,_KL2alpha_table['y'],_KL2alpha_table['Yy'],KLB)
+    y = np.interp(KLB,_KL2alpha_table['Yy'],_KL2alpha_table['y'],left=1,right=0)
     alpha = np.arcsin(y)
-    return alpha
+    return np.degrees(alpha)
 
 def fce2B(fce):
     """
@@ -127,7 +128,7 @@ def SL_Y(y):
 
 def dipole_mirror_latitude(alpha0,units = 'deg'):
     """
-    mirror_lat = dipole_mirror_latitude(alpha0)
+    mirror_lat = dipole_mirror_latitude(alpha0,units = 'deg')
     compute dipolar mirror latitude of particle with equatorial pitch angle
     alpha0, angles in degrees
     mirror_lat = dipole_mirror_latitude(alpha0,'rad')
@@ -143,8 +144,7 @@ def dipole_mirror_latitude(alpha0,units = 'deg'):
 
     sina0 = np.sin(alpha0*torad)
     if sina0==0:
-        mirror_lat = np.inf
-        return mirror_lat
+        return np.inf
 
     # note, below fixes error in Shprits thesis, eqn  F13
     # which has sina0**2. Instead use sina0**4 from Shprits 2006 eqn 10.
@@ -154,8 +154,8 @@ def dipole_mirror_latitude(alpha0,units = 'deg'):
         xroots = np.roots(Px)
         #xroot = xroots((imag(xroots)==0) & (real(xroots)>0))
         xroot = xroots[(np.abs(xroots.imag)<1e-30) & (xroots.real>0)]        
-        mirror_lat[i] = np.degrees(np.arccos(np.sqrt(xroot))) # mirror latitude
-    return mirror_lat
+        mirror_lat[i] = np.arccos(np.sqrt(xroot)) # mirror latitude
+    return mirror_lat/torad
 
 global _maglat_table
 _maglat_table = None
@@ -195,6 +195,7 @@ def BB0toMagLat(BB0, unit = 'deg'):
 
 def DriftPeriod(Species,Energy,PitchAngle,L, unit = 'deg'):
     """ 
+    Td = DriftPeriod(Species,Energy,PitchAngle,L, unit = 'deg')
     calculates particle drift period (seconds), dipole
     Species: 'e' for electrons, 'p' for protons
     Energy: in MeV
@@ -224,7 +225,7 @@ def DriftPeriod(Species,Energy,PitchAngle,L, unit = 'deg'):
 
 def BouncePeriod(Species,Energy,PitchAngle,L,unit='deg'):
     """
-    function Tb = BouncePeriod(Species,Energy,PitchAngle,L,unit='deg')
+    Tb = BouncePeriod(Species,Energy,PitchAngle,L,unit='deg')
     calculates particle bounce period Tb (seconds), dipole
     Species: 'e' for electrons, 'p' for protons
     Energy: in MeV
@@ -246,7 +247,7 @@ def BouncePeriod(Species,Energy,PitchAngle,L,unit='deg'):
 
 def GyroPeriod(Species,Energy,MagLat,L):
     """
-    function Tg = GyroPeriod(Species,Energy,MagLat,L,unit='deg')
+    Tg = GyroPeriod(Species,Energy,MagLat,L,unit='deg')
     calculates particle gyro period Tg (seconds), dipole
     Species: 'e' for electrons, 'p' for protons
     Energy: in MeV
@@ -496,13 +497,14 @@ def Ealpha2MK(E,alpha,L,species,Bunit = 'G'):
 
 def MK2Ealpha(M,K,L,species,Bunit='G'):
     """
+    (E,alpha) = MK2Ealpha(M,K,L,species,Bunit='G')
     for M in MeV/G and K in RE*sqrt(G)
     (or MeV/nT and RE*sqrt(nT) if Bunit = 'nT')
     returns E in MeV, alpha in degrees
     using dipole field
     Bunit = 'G' by default
     """
-    alpha = KL2alpha(K,L,Bunit)
+    alpha = KL2alpha(K,L,Bunit) # degrees
     B = dipoleB(L,0,0) # nT
     if Bunit=='G':
         MG = M
